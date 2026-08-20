@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>EVEngine — 把引擎交给 AI，把游戏留给自己</title>
-  <meta name="description" content="EVEngine：一个轻量、可脚本化、跨平台的游戏引擎。Squirrel 脚本驱动、Vulkan 渲染，支持 Windows / Linux / macOS / Android / iOS / WebGPU，并原生支持 AI 编程助手一键接入（Codex skill + 本地 MCP）。">
+  <meta name="description" content="EVEngine：一个轻量、可脚本化、跨平台的游戏引擎。Squirrel 脚本驱动、Vulkan 渲染，支持 Windows / Linux / macOS / Android / iOS / WebGPU。下载 SDK 即用，AI 编程助手（Codex / Cursor / Claude Code）可一键接入：skill + MCP。">
   <meta property="og:title" content="EVEngine — 把引擎交给 AI，把游戏留给自己">
   <meta property="og:description" content="轻量 Squirrel 脚本游戏引擎 · Vulkan 渲染 · 跨平台 · AI 一键接入">
   <meta property="og:type" content="website">
@@ -181,7 +181,7 @@
     <div class="eyebrow">EVEngine · v0.1.0 · Vulkan · Squirrel</div>
     <h1>
       <span class="zh">把引擎交给 AI，<br>把游戏留给自己。</span>
-      <span class="en">A lightweight, script-driven game engine your AI can drive — from clone to running game in one command.</span>
+      <span class="en">A lightweight, script-driven game engine your AI can drive — download the SDK, then let your AI build the game.</span>
     </h1>
     <div class="hero-actions">
       <a class="btn signal" href="#download">下载 SDK</a>
@@ -221,7 +221,7 @@
     <div class="sec-head">
       <div class="sec-eyebrow">Download</div>
       <h2>下载 SDK</h2>
-      <p class="sec-sub">每个平台一份独立 SDK：开箱即用的 eve 运行时、公开头文件、CMake 插件配置（find_package + add_eve_plugin）与打包模板。v0.1.0 正式版。</p>
+      <p class="sec-sub">每个平台一份独立 SDK，下载解压即可用，无需编译引擎：开箱即用的 eve 运行时、公开头文件、CMake 插件配置（find_package + add_eve_plugin）与打包模板。v0.1.0 正式版。</p>
     </div>
     <div class="grid">
       <div class="card"><span class="plat-name">Windows</span><span class="plat-desc">x64 · eve.exe + 运行时 DLL</span><a class="dl" href="https://github.com/EVEngine/EVEngine/releases/download/v0.1.0/eve-sdk-win32-v0.1.0.zip">下载 eve-sdk-win32-v0.1.0.zip</a></div>
@@ -241,33 +241,62 @@
     <div class="sec-head">
       <div class="sec-eyebrow">AI-native</div>
       <h2>给 AI 用户的一键接入</h2>
-      <p class="sec-sub">EVEngine 从设计上就欢迎 AI 参与：克隆仓库即得一个 Codex skill，本地再跑一个 MCP 桥，AI 就能直接构建、运行、调试你的游戏。</p>
+      <p class="sec-sub">不用编译引擎：下载 SDK 后，装一个 skill、加一个 MCP，Codex / Cursor / Claude Code 就能直接帮你写脚本、运行、调试、打包游戏。</p>
     </div>
     <div class="ai-grid">
       <div class="ai-card">
-        <h3>一键 Skill <span class="tag">Codex</span></h3>
-        <p>克隆仓库后，Codex 会自动加载 <code>.cursor/skills/evengine</code>：构建、运行示例、改 Squirrel 脚本、查模块用法，全都有现成指引。</p>
-        <pre><span class="cm"># 一步到位：clone 即接入</span>
-git clone --recurse-submodules https://github.com/EVEngine/EVEngine.git
-cd EVEngine
-<span class="cm"># 然后直接对 Codex 说：</span>
-“用 EVEngine 给我做个打砖块，跑起来”</pre>
-        <p>Skill 内含：构建/运行命令、Squirrel 入口约定、模块手册索引、常见平台坑（Vulkan SDK / 无头环境）。</p>
+        <h3>Codex <span class="tag">skill + MCP</span></h3>
+        <p>装上 skill 后，Codex 自动知道怎么用 <code>eve</code>：定位 SDK、建工程、改脚本、运行、打包。</p>
+        <pre><span class="cm"># 1) 装 skill（用户级，所有项目可用）</span>
+mkdir -p ~/.agents/skills/evengine && \
+curl -fsSL https://raw.githubusercontent.com/EVEngine/EVEngine.github.io/main/skills/evengine/SKILL.md \
+  -o ~/.agents/skills/evengine/SKILL.md
+
+<span class="cm"># 2) 加 MCP，让 Codex 直连引擎</span>
+codex mcp add evengine -- eve mcp --root /path/to/your/game</pre>
+        <p>也可写到 <code>~/.codex/config.toml</code>：<code>[mcp_servers.evengine]</code> + <code>command = "eve"</code>、<code>args = ["mcp", "--root", "…"]</code>。</p>
       </div>
       <div class="ai-card">
-        <h3>本地 MCP <span class="tag">eve-mcp</span></h3>
-        <p>让 AI 直连一个<strong>正在运行</strong>的引擎会话：暂停、求值、截帧、切片报错，都在 <code>tools/eve-mcp</code> 里现成可用。</p>
-        <pre><span class="cm"># 1) 带 MCP 端口启动游戏</span>
-eve run --debug --mcp-port=7529 examples/basic
+        <h3>Cursor <span class="tag">skill + MCP</span></h3>
+        <p>Cursor 会自动加载 <code>.agents/skills</code>、<code>.cursor/skills</code> 及对应全局目录，装一次全项目可用。</p>
+        <pre><span class="cm"># 1) 装 skill（全局）</span>
+mkdir -p ~/.cursor/skills/evengine && \
+curl -fsSL https://raw.githubusercontent.com/EVEngine/EVEngine.github.io/main/skills/evengine/SKILL.md \
+  -o ~/.cursor/skills/evengine/SKILL.md
 
-<span class="cm"># 2) 在 Codex / Cursor / Claude Desktop 配置</span>
-<span class="c-dim">mcpServers:</span> {
-  <span class="c-dim">evengine:</span> { <span class="c-dim">command:</span> "node",
-    <span class="c-dim">args:</span> ["tools/eve-mcp/server.js"],
-    <span class="c-dim">env:</span> { <span class="c-dim">EVE_MCP_HOST:</span> "127.0.0.1",
-           <span class="c-dim">EVE_MCP_PORT:</span> "7529" } } }</pre>
-        <p>可用工具：<code>eve_status</code> / <code>eve_eval</code> / <code>eve_pause</code> / <code>eve_snapshot_capture</code> / <code>eve_error_slice</code>。</p>
+<span class="cm"># 2) 项目根目录建 .cursor/mcp.json</span>
+<span class="c-dim">{ "mcpServers": { "evengine": {</span>
+    <span class="c-dim">"command": "eve",</span>
+    <span class="c-dim">"args": ["mcp", "--root", "/path/to/your/game"]</span>
+<span class="c-dim">} } }</span></pre>
+        <p>也可以放进游戏仓库的 <code>.cursor/skills/evengine/</code>，随仓库共享给整个团队。</p>
       </div>
+      <div class="ai-card">
+        <h3>Claude Code <span class="tag">skill + MCP</span></h3>
+        <p>Claude 遵循 Agent Skills 开放标准，同一个 SKILL.md 直接用；个人级或项目级都行。</p>
+        <pre><span class="cm"># 1) 装 skill（个人级）</span>
+mkdir -p ~/.claude/skills/evengine && \
+curl -fsSL https://raw.githubusercontent.com/EVEngine/EVEngine.github.io/main/skills/evengine/SKILL.md \
+  -o ~/.claude/skills/evengine/SKILL.md
+
+<span class="cm"># 2) 加 MCP</span>
+claude mcp add evengine -- eve mcp --root /path/to/your/game</pre>
+        <p>或写进项目 <code>.claude/skills/</code> 与 <code>.mcp.json</code>，随仓库共享。</p>
+      </div>
+      <div class="ai-card">
+        <h3>eve-mcp <span class="tag">无头 host</span></h3>
+        <p>SDK 自带 <code>eve mcp</code>：stdio 直连引擎，暴露 <code>eve_host_*</code> 工具（创建窗口、截帧、执行 Squirrel、ViewModel 双向绑定），无需 Node。</p>
+        <pre><span class="cm"># 启动无头 MCP host</span>
+eve mcp --root ./my-game
+
+<span class="cm"># 或直连一个正在运行的游戏</span>
+eve run --debug --mcp-port=7529 ./my-game</pre>
+        <p>工具集：<code>eve_status</code> / <code>eve_eval</code> / <code>eve_pause</code> / <code>eve_snapshot_capture</code> / <code>eve_error_slice</code>。</p>
+      </div>
+    </div>
+    <div class="aux-links">
+      <a href="https://github.com/EVEngine/EVEngine.github.io/tree/main/skills/evengine" target="_blank" rel="noopener">下载 evengine skill ↗</a>
+      <a href="https://github.com/EVEngine/EVEngine/tree/main/tools/eve-mcp" target="_blank" rel="noopener">eve-mcp 源码 ↗</a>
     </div>
   </section>
   <section class="wrap">
@@ -278,7 +307,7 @@ eve run --debug --mcp-port=7529 examples/basic
     <div class="links">
       <div class="link-card"><h3>在线文档</h3><p>API 参考 + 用户手册 + 模块速查，持续构建于 GitHub Pages。</p><a href="https://evengine.github.io/EVEngine/" target="_blank" rel="noopener">evengine.github.io/EVEngine/ ↗</a></div>
       <div class="link-card"><h3>源码仓库</h3><p>开发与发布都在这里：示例、测试、Issue 与 Release。</p><a href="https://github.com/EVEngine/EVEngine" target="_blank" rel="noopener">github.com/EVEngine/EVEngine ↗</a></div>
-      <div class="link-card"><h3>快速开始</h3><p>从克隆到看到画面，大约一杯咖啡的时间。</p><a href="https://evengine.github.io/EVEngine/" target="_blank" rel="noopener">阅读用户指南 ↗</a></div>
+      <div class="link-card"><h3>快速开始</h3><p>下载 SDK、装 skill，从零到看到画面不到五分钟。</p><a href="#download">下载 SDK 开始 ↗</a></div>
     </div>
   </section>
   <footer>
