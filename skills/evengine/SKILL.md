@@ -46,28 +46,38 @@ config = { width=960 height=540 title="My Game" hotReload=true };
 
 ```squirrel
 eve_init = function() {
-    local g = eve.Graphics();
-    g.clear(0.08, 0.10, 0.20, 1.0);
+    gfx.setBackgroundColor(0.08, 0.10, 0.20, 1.0);
     print("hello eve\n");
 };
 eve_update = function(dt) {
     // 每帧逻辑，dt 为秒
 };
+eve_render = function() {
+    gfx.clear();
+    // 在这里做绘制
+};
 ```
 
-引擎能力按模块提供，常用入口：
+引擎按 `eve.moduleList` 把模块以**全局变量**注入 root 表：`gfx` / `win` /
+`keyboard` / `mouse` / `ui` / `physics` / `map` / `particles` / `audio` /
+`timer` / `scene` …（具体随构建裁剪，写脚本前用 `has_module("slot")` 判断）。
+常用写法：
 
 ```squirrel
-local g = eve.Graphics();      // 2D/3D 绘制、清屏、sprite
-local w = eve.Window();        // 窗口、输入、事件
-local p = eve.Physics();       // Box2D / Box3D
-local m = eve.Map();           // tilemap
-local parts = eve.Particles();
+gfx.setBackgroundColor(0.08, 0.10, 0.20, 1.0);  // 背景色
+gfx.drawSolidRect(x, y, w, h, 1.3, 0.8, 0.4, 1.0);  // 实心矩形
+local fx = particles.newEmitter(256);           // 粒子（particles 为全局实例）
+fx.applyPreset("fire");
+fx.start();
+local world = physics.newWorld(0.0, 980.0, true);  // Box2D 世界（+Y 向下）
 ```
 
-写脚本前先确认模块存在：`has_module("slot")`（裁剪构建时部分模块会被移除）。
+模块也可用 `eve.<Class>()` 构造独立实例（如 `eve.Particles()`、`eve.Map()`、
+`eve.Physics()`）。可参考仓库示例 `examples/basic/main.nut`。
 查某个类/函数的用法时先打开在线手册：
 https://evengine.github.io/EVEngine/（API 参考 + 用户手册 + 模块速查）。
+
+注意：v0.1.0 的 `eve doc` 命令有缺陷（打开失效站点且无终端输出），不要依赖它。
 
 ## 3. 运行与热重载
 
@@ -78,6 +88,11 @@ eve run                       # 在游戏目录内直接运行当前目录
 
 - `config.hotReload=true` 时改脚本会自动热重载，无需重启。
 - 出错时优先看 `eve` 的 stdout / stderr 与脚本堆栈。
+- `eve run` 会创建真实窗口并阻塞进程（`--no-window` 目前仍会初始化窗口），
+  脚本测试注意超时/截图，别让它一直挂着。
+- 受限沙箱或无桌面环境可能报
+  `Run failed: Failed to initialize filesystem: no error`——这是环境权限问题，
+  给 eve 放开文件/窗口权限或在本机桌面运行即可，不是引擎故障。
 
 ## 4. 打包与分发
 
