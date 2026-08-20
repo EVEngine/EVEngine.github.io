@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EVEngine — 把引擎交给 AI，把游戏留给自己</title>
+  <meta name="description" content="EVEngine：一个轻量、可脚本化、跨平台的游戏引擎。Squirrel 脚本驱动、Vulkan 渲染，支持 Windows / Linux / macOS / Android / iOS / WebGPU，并原生支持 AI 编程助手一键接入（Codex skill + 本地 MCP）。">
+  <meta property="og:title" content="EVEngine — 把引擎交给 AI，把游戏留给自己">
+  <meta property="og:description" content="轻量 Squirrel 脚本游戏引擎 · Vulkan 渲染 · 跨平台 · AI 一键接入">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2 28 9v14L16 30 4 23V9z' fill='%230B1020' stroke='%23FFC857' stroke-width='2'/%3E%3Cpath d='M16 9 22 12.5v7L16 23l-6-3.5v-7z' fill='%2359D8FF'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0B1020;
+      --panel: #111A2E;
+      --panel-2: #0E1626;
+      --line: #22314F;
+      --signal: #FFC857;
+      --accent: #59D8FF;
+      --paper: #E7ECF6;
+      --muted: #8FA0BE;
+      --ok: #6FDD8B;
+      --display: "Chakra Petch", system-ui, sans-serif;
+      --body: "Inter", system-ui, sans-serif;
+      --mono: "IBM Plex Mono", ui-monospace, monospace;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--paper);
+      font: 400 16px/1.65 var(--body);
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    :focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; border-radius: 2px; }
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+    .backdrop {
+      position: fixed; inset: 0; z-index: -1; pointer-events: none;
+      background:
+        linear-gradient(var(--line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line) 1px, transparent 1px);
+      background-size: 44px 44px;
+      -webkit-mask-image: radial-gradient(ellipse at 50% 0%, rgba(0,0,0,.55), transparent 75%);
+      mask-image: radial-gradient(ellipse at 50% 0%, rgba(0,0,0,.55), transparent 75%);
+    }
+    nav { position: sticky; top: 0; z-index: 10; backdrop-filter: blur(8px); background: rgba(11,16,32,.78); border-bottom: 1px solid var(--line); }
+    .nav { display: flex; align-items: center; gap: 22px; height: 58px; }
+    .brand { display: flex; align-items: center; gap: 10px; font: 600 16px var(--display); color: var(--paper); }
+    .brand svg { width: 22px; height: 22px; }
+    .nav-links { margin-left: auto; display: flex; gap: 18px; font-size: 14px; }
+    .nav-links a { color: var(--muted); }
+    .nav-links a:hover { color: var(--paper); text-decoration: none; }
+    .hero { padding: 96px 0 64px; }
+    .eyebrow {
+      font: 500 13px var(--mono); letter-spacing: .18em; color: var(--signal);
+      text-transform: uppercase; display: flex; align-items: center; gap: 10px;
+    }
+    .eyebrow::before { content: ""; width: 26px; height: 1px; background: var(--signal); }
+    h1 {
+      font: 700 clamp(34px, 6vw, 64px)/1.08 var(--display);
+      margin: 20px 0 14px; letter-spacing: .01em;
+    }
+    h1 .zh { display: block; }
+    h1 .en {
+      display: block; margin-top: 14px;
+      font: 500 clamp(15px, 2.2vw, 20px)/1.5 var(--body);
+      color: var(--muted); letter-spacing: .01em;
+    }
+    .hero-actions { display: flex; gap: 14px; margin-top: 30px; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 11px 20px; border-radius: 6px;
+      font: 600 15px var(--body); border: 1px solid var(--line);
+      background: var(--panel); color: var(--paper);
+      transition: border-color .15s, transform .15s;
+    }
+    .btn:hover { text-decoration: none; border-color: var(--signal); transform: translateY(-1px); }
+    .btn.signal { background: var(--signal); color: #1A1406; border-color: var(--signal); }
+    .btn.signal:hover { background: #FFD87A; }
+    .console {
+      margin-top: 44px; border: 1px solid var(--line); border-radius: 8px;
+      background: var(--panel-2); overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,.35);
+    }
+    .console-bar {
+      display: flex; align-items: center; gap: 8px; padding: 9px 14px;
+      border-bottom: 1px solid var(--line); background: var(--panel);
+      font: 500 12px var(--mono); color: var(--muted);
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot.r { background: #FF6B6B; } .dot.y { background: var(--signal); } .dot.g { background: var(--ok); }
+    .console-title { margin-left: 6px; letter-spacing: .06em; }
+    .console-body { padding: 18px 20px 20px; font: 400 13.5px/1.8 var(--mono); }
+    .c-line { display: block; white-space: pre-wrap; opacity: 0; animation: rise .4s ease forwards; }
+    .c-line:nth-child(1) { animation-delay: .15s; }
+    .c-line:nth-child(2) { animation-delay: .45s; }
+    .c-line:nth-child(3) { animation-delay: .75s; }
+    .c-line:nth-child(4) { animation-delay: 1.05s; }
+    .c-line:nth-child(5) { animation-delay: 1.35s; }
+    .c-prompt { color: var(--accent); }
+    .c-ok { color: var(--ok); }
+    .c-dim { color: var(--muted); }
+    .c-frame { color: var(--signal); }
+    .cursor { display: inline-block; width: 8px; height: 15px; background: var(--signal); vertical-align: -2px; margin-left: 2px; animation: blink 1.1s steps(1) infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+    @keyframes rise { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .cursor { animation: none; }
+      .c-line { animation: none !important; opacity: 1 !important; }
+    }
+    section { padding: 58px 0; border-top: 1px solid var(--line); }
+    .sec-head { margin-bottom: 28px; }
+    .sec-eyebrow { font: 500 12px var(--mono); letter-spacing: .18em; color: var(--signal); text-transform: uppercase; }
+    h2 { font: 600 clamp(22px, 3.4vw, 32px) var(--display); margin: 8px 0 6px; }
+    .sec-sub { color: var(--muted); max-width: 640px; margin: 0; }
+    .platforms { display: flex; flex-wrap: wrap; gap: 10px; }
+    .plat {
+      padding: 10px 16px; border: 1px solid var(--line); border-radius: 6px;
+      background: var(--panel); font: 600 14px var(--display); color: var(--paper);
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .plat::before { content: ""; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); transform: rotate(45deg); }
+    .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+    .card {
+      border: 1px solid var(--line); border-radius: 8px; background: var(--panel);
+      padding: 18px; display: flex; flex-direction: column; gap: 8px;
+      transition: border-color .15s, transform .15s;
+    }
+    .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .card .plat-name { font: 600 17px var(--display); color: var(--paper); }
+    .card .plat-desc { font: 400 13px var(--body); color: var(--muted); }
+    .card a.dl { margin-top: auto; font: 600 13px var(--mono); color: var(--accent); }
+    .aux-links { margin-top: 18px; display: flex; gap: 18px; flex-wrap: wrap; font: 500 14px var(--mono); }
+    .ai-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+    .ai-card { border: 1px solid var(--line); border-radius: 8px; background: var(--panel); padding: 24px; }
+    .ai-card h3 { font: 600 19px var(--display); margin: 0 0 10px; display: flex; align-items: center; gap: 10px; }
+    .tag { font: 500 11px var(--mono); letter-spacing: .08em; color: var(--signal); border: 1px solid var(--line); padding: 2px 8px; border-radius: 999px; }
+    .ai-card p { margin: 0 0 14px; color: var(--muted); font-size: 14.5px; }
+    pre {
+      margin: 0 0 14px; padding: 14px 16px; border-radius: 6px;
+      background: var(--panel-2); border: 1px solid var(--line);
+      font: 400 13px/1.7 var(--mono); overflow-x: auto; color: var(--paper);
+    }
+    pre .cm { color: var(--muted); }
+    .links { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+    .link-card { border: 1px solid var(--line); border-radius: 8px; background: var(--panel); padding: 20px; }
+    .link-card h3 { font: 600 17px var(--display); margin: 0 0 6px; }
+    .link-card p { margin: 0 0 10px; color: var(--muted); font-size: 14px; }
+    .link-card a { font: 500 14px var(--mono); }
+    footer { padding: 34px 0 48px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+    .foot { display: flex; gap: 18px; flex-wrap: wrap; align-items: baseline; }
+    @media (max-width: 640px) {
+      .hero { padding-top: 64px; }
+      .nav-links { gap: 12px; font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="backdrop" aria-hidden="true"></div>
+  <nav>
+    <div class="wrap nav">
+      <a class="brand" href="#top" aria-label="EVEngine 首页">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2 28 9v14L16 30 4 23V9z" fill="none" stroke="#FFC857" stroke-width="2"/><path d="M16 9 22 12.5v7L16 23l-6-3.5v-7z" fill="#59D8FF"/></svg>
+        EVEngine
+      </a>
+      <div class="nav-links">
+        <a href="#download">下载 SDK</a>
+        <a href="#ai">AI 接入</a>
+        <a href="https://evengine.github.io/EVEngine/" target="_blank" rel="noopener">文档</a>
+        <a href="https://github.com/EVEngine/EVEngine" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </nav>
+  <header class="hero wrap" id="top">
+    <div class="eyebrow">EVEngine · v0.1.0 · Vulkan · Squirrel</div>
+    <h1>
+      <span class="zh">把引擎交给 AI，<br>把游戏留给自己。</span>
+      <span class="en">A lightweight, script-driven game engine your AI can drive — from clone to running game in one command.</span>
+    </h1>
+    <div class="hero-actions">
+      <a class="btn signal" href="#download">下载 SDK</a>
+      <a class="btn" href="#ai">AI 一键接入</a>
+      <a class="btn" href="https://github.com/EVEngine/EVEngine" target="_blank" rel="noopener">GitHub ↗</a>
+    </div>
+    <div class="console" aria-label="运行 EVEngine 示例的终端输出">
+      <div class="console-bar">
+        <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+        <span class="console-title">eve — examples/basic</span>
+      </div>
+      <div class="console-body">
+        <span class="c-line"><span class="c-prompt">$</span> eve run examples/basic</span>
+        <span class="c-line"><span class="c-ok">[system]</span> <span class="c-dim">platform=win32&nbsp; renderer=vulkan&nbsp; script=squirrel&nbsp; hotreload=on</span></span>
+        <span class="c-line"><span class="c-ok">[startup]</span> <span class="c-dim">graphics initWithWindow: 857.5 ms &nbsp;·&nbsp; modules: 56/56</span></span>
+        <span class="c-line"><span class="c-ok">[scene]</span> <span class="c-dim">tilemap + box2d + particles ready</span></span>
+        <span class="c-line"><span class="c-frame">[frame]</span> <span class="c-dim">fps=60&nbsp; draw_calls=42&nbsp; frame=</span><span class="c-frame" id="frameCounter">000000</span><span class="cursor" aria-hidden="true"></span></span>
+      </div>
+    </div>
+  </header>
+  <section class="wrap">
+    <div class="sec-head">
+      <div class="sec-eyebrow">Platforms</div>
+      <h2>一套引擎，六块屏幕</h2>
+      <p class="sec-sub">Vulkan 渲染核心 + Squirrel 脚本层，从桌面到移动端到浏览器，同一份游戏代码。</p>
+    </div>
+    <div class="platforms">
+      <span class="plat">Windows</span>
+      <span class="plat">Linux</span>
+      <span class="plat">macOS</span>
+      <span class="plat">Android</span>
+      <span class="plat">iOS</span>
+      <span class="plat">WebGPU / WASM</span>
+    </div>
+  </section>
+  <section class="wrap" id="download">
+    <div class="sec-head">
+      <div class="sec-eyebrow">Download</div>
+      <h2>下载 SDK</h2>
+      <p class="sec-sub">每个平台一份独立 SDK：开箱即用的 eve 运行时、公开头文件、CMake 插件配置（find_package + add_eve_plugin）与打包模板。v0.1.0 正式版。</p>
+    </div>
+    <div class="grid">
+      <div class="card"><span class="plat-name">Windows</span><span class="plat-desc">x64 · eve.exe + 运行时 DLL</span><a class="dl" href="https://github.com/EVEngine/EVEngine/releases/download/v0.1.0/eve-sdk-win32-v0.1.0.zip">下载 eve-sdk-win32-v0.1.0.zip</a></div>
+      <div class="card"><span class="plat-name">Linux</span><span class="plat-desc">x86_64 · eve + 依赖</span><a class="dl" href="https://github.com/EVEngine/EVEngine/releases/download/v0.1.0/eve-sdk-linux-v0.1.0.zip">下载 eve-sdk-linux-v0.1.0.zip</a></div>
+      <div class="card"><span class="plat-name">macOS</span><span class="plat-desc">Apple Silicon · eve + Vulkan loader</span><a class="dl" href="https://github.com/EVEngine/EVEngine/releases/download/v0.1.0/eve-sdk-macosx-v0.1.0.zip">下载 eve-sdk-macosx-v0.1.0.zip</a></div>
+      <div class="card"><span class="plat-name">Android</span><span class="plat-desc">arm64 · libmain.so + 打包模板</span><a class="dl" href="https://github.com/EVEngine/EVEngine/releases/download/v0.1.0/eve-sdk-android-v0.1.0.zip">下载 eve-sdk-android-v0.1.0.zip</a></div>
+      <div class="card"><span class="plat-name">iOS</span><span class="plat-desc">arm64 · eve.app + 打包模板</span><a class="dl" href="https://github.com/EVEngine/EVEngine/releases/download/v0.1.0/eve-sdk-ios-v0.1.0.zip">下载 eve-sdk-ios-v0.1.0.zip</a></div>
+      <div class="card"><span class="plat-name">WebGPU</span><span class="plat-desc">浏览器构建（源码构建）</span><a class="dl" href="https://github.com/EVEngine/EVEngine" target="_blank" rel="noopener">前往仓库构建 ↗</a></div>
+    </div>
+    <div class="aux-links">
+      <a href="https://github.com/EVEngine/EVEngine/releases/download/v0.1.0/SHA256SUMS">SHA256SUMS</a>
+      <a href="https://github.com/EVEngine/EVEngine/releases/tag/v0.1.0" target="_blank" rel="noopener">Release v0.1.0 ↗</a>
+      <a href="https://github.com/EVEngine/EVEngine" target="_blank" rel="noopener">源码仓库 ↗</a>
+    </div>
+  </section>
+  <section class="wrap" id="ai">
+    <div class="sec-head">
+      <div class="sec-eyebrow">AI-native</div>
+      <h2>给 AI 用户的一键接入</h2>
+      <p class="sec-sub">EVEngine 从设计上就欢迎 AI 参与：克隆仓库即得一个 Codex skill，本地再跑一个 MCP 桥，AI 就能直接构建、运行、调试你的游戏。</p>
+    </div>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <h3>一键 Skill <span class="tag">Codex</span></h3>
+        <p>克隆仓库后，Codex 会自动加载 <code>.cursor/skills/evengine</code>：构建、运行示例、改 Squirrel 脚本、查模块用法，全都有现成指引。</p>
+        <pre><span class="cm"># 一步到位：clone 即接入</span>
+git clone --recurse-submodules https://github.com/EVEngine/EVEngine.git
+cd EVEngine
+<span class="cm"># 然后直接对 Codex 说：</span>
+“用 EVEngine 给我做个打砖块，跑起来”</pre>
+        <p>Skill 内含：构建/运行命令、Squirrel 入口约定、模块手册索引、常见平台坑（Vulkan SDK / 无头环境）。</p>
+      </div>
+      <div class="ai-card">
+        <h3>本地 MCP <span class="tag">eve-mcp</span></h3>
+        <p>让 AI 直连一个<strong>正在运行</strong>的引擎会话：暂停、求值、截帧、切片报错，都在 <code>tools/eve-mcp</code> 里现成可用。</p>
+        <pre><span class="cm"># 1) 带 MCP 端口启动游戏</span>
+eve run --debug --mcp-port=7529 examples/basic
+
+<span class="cm"># 2) 在 Codex / Cursor / Claude Desktop 配置</span>
+<span class="c-dim">mcpServers:</span> {
+  <span class="c-dim">evengine:</span> { <span class="c-dim">command:</span> "node",
+    <span class="c-dim">args:</span> ["tools/eve-mcp/server.js"],
+    <span class="c-dim">env:</span> { <span class="c-dim">EVE_MCP_HOST:</span> "127.0.0.1",
+           <span class="c-dim">EVE_MCP_PORT:</span> "7529" } } }</pre>
+        <p>可用工具：<code>eve_status</code> / <code>eve_eval</code> / <code>eve_pause</code> / <code>eve_snapshot_capture</code> / <code>eve_error_slice</code>。</p>
+      </div>
+    </div>
+  </section>
+  <section class="wrap">
+    <div class="sec-head">
+      <div class="sec-eyebrow">Learn</div>
+      <h2>文档与仓库</h2>
+    </div>
+    <div class="links">
+      <div class="link-card"><h3>在线文档</h3><p>API 参考 + 用户手册 + 模块速查，持续构建于 GitHub Pages。</p><a href="https://evengine.github.io/EVEngine/" target="_blank" rel="noopener">evengine.github.io/EVEngine/ ↗</a></div>
+      <div class="link-card"><h3>源码仓库</h3><p>开发与发布都在这里：示例、测试、Issue 与 Release。</p><a href="https://github.com/EVEngine/EVEngine" target="_blank" rel="noopener">github.com/EVEngine/EVEngine ↗</a></div>
+      <div class="link-card"><h3>快速开始</h3><p>从克隆到看到画面，大约一杯咖啡的时间。</p><a href="https://evengine.github.io/EVEngine/" target="_blank" rel="noopener">阅读用户指南 ↗</a></div>
+    </div>
+  </section>
+  <footer>
+    <div class="wrap foot">
+      <span>EVEngine © 2026 · 开源与商业双许可（见仓库 LICENSE-OPENSOURCE / LICENSE-COMMERCIAL）</span>
+      <a href="https://github.com/EVEngine/EVEngine" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://evengine.github.io/EVEngine/" target="_blank" rel="noopener">Docs</a>
+    </div>
+  </footer>
+  <script>
+    (function () {
+      var n = 0;
+      var el = document.getElementById("frameCounter");
+      var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (reduce || !el) return;
+      setInterval(function () {
+        n += 60;
+        el.textContent = String(n).padStart(6, "0");
+      }, 1000);
+    })();
+  </script>
+</body>
+</html>
