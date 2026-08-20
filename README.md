@@ -8,7 +8,8 @@ EVEngine 组织的项目宣传主页，托管于 GitHub Pages：
 - 项目介绍与跨平台矩阵
 - v0.1.0 各平台 SDK 下载链接与校验和（下载解压即用，无需编译引擎）
 - AI 一键接入：`skills/evengine/SKILL.md`（Agent Skills 开放标准，Codex / Cursor /
-  Claude Code 通用）+ SDK 自带的 `eve mcp` 无头 MCP host
+  Claude Code 通用）+ 通过 AI 工具 MCP 配置接入的 `eve mcp`
+  （MCP 服务，本身不含大模型，由工具链拉起，无需单独运行）
 - 在线文档与源码仓库入口
 
 修改 `index.html` 后推送到 `main` 即可自动发布。

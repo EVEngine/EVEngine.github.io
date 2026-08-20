@@ -110,7 +110,9 @@ eve package <game-dir> -o <out-dir> --sdk <sdk-root>   # 自包含可运行目�
 
 ## 5. 连接 AI（MCP，可选）
 
-两种方式：
+`eve mcp` 是供 AI 工具链调用的 MCP 服务，本身不含大模型：只有通过
+Codex / Cursor / Claude 的 MCP 配置启动才有意义，不要把它当独立程序运行。
+两种接入方式：
 
 1. **无头 host（推荐，stdio，无需 Node）**：
 

@@ -154,6 +154,7 @@
     }
     .copy-btn:hover { color: var(--paper); border-color: var(--accent); }
     .copy-btn.done { color: var(--ok); border-color: var(--ok); }
+    .mcp-note { color: var(--muted); font-size: 14px; margin: 18px 0 0; }
     pre {
       margin: 0 0 14px; padding: 14px 16px; border-radius: 6px;
       background: var(--panel-2); border: 1px solid var(--line);
@@ -319,20 +320,8 @@ claude mcp add evengine -- eve mcp</pre>
         </div>
         <p>或写进项目 <code>.claude/skills/</code> 与 <code>.mcp.json</code>，随仓库共享。</p>
       </div>
-      <div class="ai-card">
-        <h3>eve-mcp <span class="tag">无头 host</span></h3>
-        <p>SDK 自带 <code>eve mcp</code>：stdio 直连引擎，暴露 <code>eve_host_*</code> 工具（创建窗口、截帧、执行 Squirrel、ViewModel 双向绑定），无需 Node。</p>
-        <div class="copy-wrap">
-          <pre><span class="cm"># 启动无头 MCP host</span>
-eve mcp --root ./my-game
-
-<span class="cm"># 或直连一个正在运行的游戏</span>
-eve run --debug --mcp-port=7529 ./my-game</pre>
-          <button class="copy-btn" type="button">复制</button>
-        </div>
-        <p>工具集：<code>eve_status</code> / <code>eve_eval</code> / <code>eve_pause</code> / <code>eve_snapshot_capture</code> / <code>eve_error_slice</code>。</p>
-      </div>
     </div>
+    <p class="mcp-note">注：<code>eve mcp</code> 是供 AI 工具链调用的 MCP 服务，本身不含大模型，单独运行没有意义；它由上面的工具通过 MCP 配置自动拉起，无需手动启动。</p>
     <div class="aux-links">
       <a href="https://github.com/EVEngine/EVEngine.github.io/tree/main/skills/evengine" target="_blank" rel="noopener">下载 evengine skill ↗</a>
       <a href="https://github.com/EVEngine/EVEngine/tree/main/tools/eve-mcp" target="_blank" rel="noopener">eve-mcp 源码 ↗</a>
