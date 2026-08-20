@@ -66,8 +66,8 @@ local parts = eve.Particles();
 ```
 
 写脚本前先确认模块存在：`has_module("slot")`（裁剪构建时部分模块会被移除）。
-查某个类/函数的用法：`eve doc <name>` 打开在线文档；完整手册在
-https://evengine.github.io/EVEngine/ 。
+查某个类/函数的用法时先打开在线手册：
+https://evengine.github.io/EVEngine/（API 参考 + 用户手册 + 模块速查）。
 
 ## 3. 运行与热重载
 
