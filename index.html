@@ -142,11 +142,24 @@
     .ai-card h3 { font: 600 19px var(--display); margin: 0 0 10px; display: flex; align-items: center; gap: 10px; }
     .tag { font: 500 11px var(--mono); letter-spacing: .08em; color: var(--signal); border: 1px solid var(--line); padding: 2px 8px; border-radius: 999px; }
     .ai-card p { margin: 0 0 14px; color: var(--muted); font-size: 14.5px; }
+    .ai-quick { border: 1px solid var(--line); border-radius: 8px; background: var(--panel); padding: 18px; margin-bottom: 18px; }
+    .ai-quick .tag { margin-bottom: 12px; display: inline-block; }
+    .ai-quick p { color: var(--muted); font-size: 14px; margin: 4px 0 0; }
+    .copy-wrap { position: relative; }
+    .copy-btn {
+      position: absolute; top: 8px; right: 8px;
+      font: 500 11px var(--mono); letter-spacing: .05em;
+      color: var(--muted); background: var(--panel); border: 1px solid var(--line);
+      border-radius: 4px; padding: 3px 9px; cursor: pointer; opacity: .9;
+    }
+    .copy-btn:hover { color: var(--paper); border-color: var(--accent); }
+    .copy-btn.done { color: var(--ok); border-color: var(--ok); }
     pre {
       margin: 0 0 14px; padding: 14px 16px; border-radius: 6px;
       background: var(--panel-2); border: 1px solid var(--line);
       font: 400 13px/1.7 var(--mono); overflow-x: auto; color: var(--paper);
     }
+    .copy-wrap pre { padding-right: 64px; }
     pre .cm { color: var(--muted); }
     .links { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
     .link-card { border: 1px solid var(--line); border-radius: 8px; background: var(--panel); padding: 20px; }
@@ -240,57 +253,82 @@
   <section class="wrap" id="ai">
     <div class="sec-head">
       <div class="sec-eyebrow">AI-native</div>
-      <h2>给 AI 用户的一键接入</h2>
-      <p class="sec-sub">不用编译引擎：下载 SDK 后，装一个 skill、加一个 MCP，Codex / Cursor / Claude Code 就能直接帮你写脚本、运行、调试、打包游戏。</p>
+      <h2>一键接入你的 AI 工具</h2>
+      <p class="sec-sub">浏览器不能直接操作你的终端，所以给两种一键方式：Cursor 有官方的 Add to Cursor 真跳转；Codex / Claude 用一条命令装好。装完 skill + MCP，AI 就能直接帮你写脚本、运行、调试、打包游戏。</p>
+    </div>
+    <div class="ai-quick">
+      <span class="tag">一条命令装全家桶</span>
+      <div class="copy-wrap">
+        <pre><span class="cm"># macOS / Linux / Git Bash（工具：codex | cursor | claude）</span>
+curl -fsSL https://raw.githubusercontent.com/EVEngine/EVEngine.github.io/main/scripts/install-skill.sh | bash -s codex
+
+<span class="cm"># Windows PowerShell（默认装给 Codex）</span>
+irm https://raw.githubusercontent.com/EVEngine/EVEngine.github.io/main/scripts/install-skill.ps1 | iex</pre>
+        <button class="copy-btn" type="button">复制</button>
+      </div>
+      <p>脚本自动把 skill 放进对应工具的全局目录；检测到 <code>eve</code> 在 PATH 时，顺带注册 MCP。</p>
     </div>
     <div class="ai-grid">
       <div class="ai-card">
         <h3>Codex <span class="tag">skill + MCP</span></h3>
         <p>装上 skill 后，Codex 自动知道怎么用 <code>eve</code>：定位 SDK、建工程、改脚本、运行、打包。</p>
-        <pre><span class="cm"># 1) 装 skill（用户级，所有项目可用）</span>
+        <div class="copy-wrap">
+          <pre><span class="cm"># 1) 装 skill（用户级，所有项目可用）</span>
 mkdir -p ~/.agents/skills/evengine && \
 curl -fsSL https://raw.githubusercontent.com/EVEngine/EVEngine.github.io/main/skills/evengine/SKILL.md \
   -o ~/.agents/skills/evengine/SKILL.md
 
-<span class="cm"># 2) 加 MCP，让 Codex 直连引擎</span>
-codex mcp add evengine -- eve mcp --root /path/to/your/game</pre>
-        <p>也可写到 <code>~/.codex/config.toml</code>：<code>[mcp_servers.evengine]</code> + <code>command = "eve"</code>、<code>args = ["mcp", "--root", "…"]</code>。</p>
+<span class="cm"># 2) 加 MCP，让 Codex 直连引擎（默认根目录 = 当前项目）</span>
+codex mcp add evengine -- eve mcp</pre>
+          <button class="copy-btn" type="button">复制</button>
+        </div>
+        <p>也可写进 <code>~/.codex/config.toml</code>：<code>[mcp_servers.evengine]</code> + <code>command = "eve"</code>、<code>args = ["mcp"]</code>。需要指定游戏目录时加 <code>--root &lt;dir&gt;</code>。</p>
       </div>
       <div class="ai-card">
         <h3>Cursor <span class="tag">skill + MCP</span></h3>
         <p>Cursor 会自动加载 <code>.agents/skills</code>、<code>.cursor/skills</code> 及对应全局目录，装一次全项目可用。</p>
-        <pre><span class="cm"># 1) 装 skill（全局）</span>
+        <a class="btn signal" style="margin-bottom:14px" href="https://cursor.com/install-mcp?name=evengine&config=eyJjb21tYW5kIjoiZXZlIiwiYXJncyI6WyJtY3AiXX0%3D" target="_blank" rel="noopener">Add to Cursor · 点一下装 MCP ↗</a>
+        <div class="copy-wrap">
+          <pre><span class="cm"># 装 skill（全局；需要 eve 在 PATH 上）</span>
 mkdir -p ~/.cursor/skills/evengine && \
 curl -fsSL https://raw.githubusercontent.com/EVEngine/EVEngine.github.io/main/skills/evengine/SKILL.md \
   -o ~/.cursor/skills/evengine/SKILL.md
 
-<span class="cm"># 2) 项目根目录建 .cursor/mcp.json</span>
+<span class="cm"># 或项目根目录建 .cursor/mcp.json</span>
 <span class="c-dim">{ "mcpServers": { "evengine": {</span>
     <span class="c-dim">"command": "eve",</span>
-    <span class="c-dim">"args": ["mcp", "--root", "/path/to/your/game"]</span>
+    <span class="c-dim">"args": ["mcp"]</span>
 <span class="c-dim">} } }</span></pre>
-        <p>也可以放进游戏仓库的 <code>.cursor/skills/evengine/</code>，随仓库共享给整个团队。</p>
+          <button class="copy-btn" type="button">复制</button>
+        </div>
+        <p>也可以放进游戏仓库的 <code>.cursor/skills/evengine/</code>，随仓库共享给整个团队。MCP 默认以打开的项目目录为游戏根目录。</p>
       </div>
       <div class="ai-card">
         <h3>Claude Code <span class="tag">skill + MCP</span></h3>
         <p>Claude 遵循 Agent Skills 开放标准，同一个 SKILL.md 直接用；个人级或项目级都行。</p>
-        <pre><span class="cm"># 1) 装 skill（个人级）</span>
+        <div class="copy-wrap">
+          <pre><span class="cm"># 1) 装 skill（个人级）</span>
 mkdir -p ~/.claude/skills/evengine && \
 curl -fsSL https://raw.githubusercontent.com/EVEngine/EVEngine.github.io/main/skills/evengine/SKILL.md \
   -o ~/.claude/skills/evengine/SKILL.md
 
 <span class="cm"># 2) 加 MCP</span>
-claude mcp add evengine -- eve mcp --root /path/to/your/game</pre>
+claude mcp add evengine -- eve mcp</pre>
+          <button class="copy-btn" type="button">复制</button>
+        </div>
         <p>或写进项目 <code>.claude/skills/</code> 与 <code>.mcp.json</code>，随仓库共享。</p>
       </div>
       <div class="ai-card">
         <h3>eve-mcp <span class="tag">无头 host</span></h3>
         <p>SDK 自带 <code>eve mcp</code>：stdio 直连引擎，暴露 <code>eve_host_*</code> 工具（创建窗口、截帧、执行 Squirrel、ViewModel 双向绑定），无需 Node。</p>
-        <pre><span class="cm"># 启动无头 MCP host</span>
+        <div class="copy-wrap">
+          <pre><span class="cm"># 启动无头 MCP host</span>
 eve mcp --root ./my-game
 
 <span class="cm"># 或直连一个正在运行的游戏</span>
 eve run --debug --mcp-port=7529 ./my-game</pre>
+          <button class="copy-btn" type="button">复制</button>
+        </div>
         <p>工具集：<code>eve_status</code> / <code>eve_eval</code> / <code>eve_pause</code> / <code>eve_snapshot_capture</code> / <code>eve_error_slice</code>。</p>
       </div>
     </div>
@@ -327,6 +365,42 @@ eve run --debug --mcp-port=7529 ./my-game</pre>
         n += 60;
         el.textContent = String(n).padStart(6, "0");
       }, 1000);
+    })();
+
+    (function () {
+      function fallbackCopy(text) {
+        var ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand("copy"); } catch (e) { /* noop */ }
+        document.body.removeChild(ta);
+      }
+      document.querySelectorAll(".copy-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var pre = btn.parentElement.querySelector("pre");
+          var text = pre ? pre.innerText : "";
+          function done() {
+            btn.textContent = "已复制 ✓";
+            btn.classList.add("done");
+            setTimeout(function () {
+              btn.textContent = "复制";
+              btn.classList.remove("done");
+            }, 1600);
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(done, function () {
+              fallbackCopy(text);
+              done();
+            });
+          } else {
+            fallbackCopy(text);
+            done();
+          }
+        });
+      });
     })();
   </script>
 </body>
