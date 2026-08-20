@@ -34,7 +34,9 @@ EVEngine 是一个 C++20 / Vulkan 游戏引擎，游戏逻辑用 Squirrel 脚本
 
 ## 2. 创建游戏（一个目录 + 两个脚本）
 
-一个游戏就是一个目录，至少包含 `config.nut` 和 `main.nut`。
+优先用 `eve create <name>` 生成工程骨架（新版 SDK；v0.1.0 的 create
+只建空目录，需手写下面两个文件）。
+一个游戏就是一个目录，至少包含 `config.nut` 和 `main.nut`：
 
 `config.nut`（窗口与运行配置）：
 
@@ -88,6 +90,8 @@ eve run                       # 在游戏目录内直接运行当前目录
 
 - `config.hotReload=true` 时改脚本会自动热重载，无需重启。
 - 出错时优先看 `eve` 的 stdout / stderr 与脚本堆栈。
+- 在空目录（无 `main.nut`）直接 `eve run` 会运行内置 meteor defense 演示，
+  无需任何脚本——适合先确认 SDK 可用。
 - `eve run` 会创建真实窗口并阻塞进程（`--no-window` 目前仍会初始化窗口），
   脚本测试注意超时/截图，别让它一直挂着。
 - 受限沙箱或无桌面环境可能报
@@ -149,6 +153,9 @@ eve package <game-dir> -o <out-dir> --sdk <sdk-root>   # 自包含可运行目�
 只有想修改引擎本身时才需要：
 `git clone https://github.com/EVEngine/EVEngine` 并按仓库 Readme 构建
 （C++20 工具链 + Vulkan SDK + `make deps`）。普通游戏开发一律用 SDK。
+
+新版本 SDK 自带参考示例 `share/eve/examples/basic/`（config.nut / main.nut /
+maps / particles 齐全），可以直接 `eve run <sdk>/share/eve/examples/basic`。
 
 ## 参考
 
