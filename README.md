@@ -6,12 +6,14 @@ EVEngine 组织的项目宣传主页，托管于 GitHub Pages：
 内容：
 
 - 项目介绍与跨平台矩阵
+- 搜索引擎元数据、结构化数据、`robots.txt` 与 `sitemap.xml`
 - v0.1.0 各平台 SDK 下载链接与校验和（下载解压即用，无需编译引擎）
 - AI 一键接入：`skills/evengine/SKILL.md`（Agent Skills 开放标准，Codex / Cursor /
   Claude Code 通用）+ 通过 AI 工具 MCP 配置接入的 `eve mcp`
   （MCP 服务，本身不含大模型，由工具链拉起，无需单独运行）
 - 开发博客（<https://evengine.github.io/Blog/>）：开发日志与技术笔记
 - 在线文档与源码仓库入口
+- 引擎源码仓库：<https://github.com/EVEngine/EVEngine>
 
 修改 `index.html` 后推送到 `main` 即可自动发布。
 

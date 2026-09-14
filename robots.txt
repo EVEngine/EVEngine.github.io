@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://evengine.github.io/sitemap.xml
