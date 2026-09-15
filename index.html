@@ -137,6 +137,8 @@
     .card .plat-desc { font: 400 13px var(--body); color: var(--muted); }
     .card a.dl { margin-top: auto; font: 600 13px var(--mono); color: var(--accent); }
     .aux-links { margin-top: 18px; display: flex; gap: 18px; flex-wrap: wrap; font: 500 14px var(--mono); }
+    .release-status { margin-top: 12px; color: var(--muted); font: 400 12px/1.6 var(--mono); }
+    .release-status.ok { color: var(--ok); }
     .ai-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
     .ai-card { border: 1px solid var(--line); border-radius: 8px; background: var(--panel); padding: 24px; }
     .ai-card h3 { font: 600 19px var(--display); margin: 0 0 10px; display: flex; align-items: center; gap: 10px; }
@@ -193,7 +195,7 @@
     </div>
   </nav>
   <header class="hero wrap" id="top">
-    <div class="eyebrow">EVEngine · v0.1.0 · Vulkan · Squirrel</div>
+    <div class="eyebrow">EVEngine · <span data-release-version>v0.5.0</span> · Vulkan · Squirrel</div>
     <h1>
       <span class="zh">把引擎交给 AI，<br>把游戏留给自己。</span>
       <span class="en">A lightweight, script-driven game engine your AI can drive — download the SDK, then let your AI build the game.</span>
@@ -236,21 +238,22 @@
     <div class="sec-head">
       <div class="sec-eyebrow">Download</div>
       <h2>下载 SDK</h2>
-      <p class="sec-sub">每个平台一份独立 SDK，下载解压即可用，无需编译引擎：开箱即用的 eve 运行时、公开头文件、CMake 插件配置（find_package + add_eve_plugin）与打包模板。v0.1.0 正式版。</p>
+      <p class="sec-sub">每个平台一份独立 SDK，下载解压即可用，无需编译引擎：开箱即用的 eve 运行时、公开头文件、CMake 插件配置（find_package + add_eve_plugin）与打包模板。<span data-release-version>v0.5.0</span> 正式版。</p>
     </div>
     <div class="grid">
-      <div class="card"><span class="plat-name">Windows</span><span class="plat-desc">x64 · eve.exe + 运行时 DLL</span><a class="dl" href="https://github.com/EVEngine/EVEngine/releases/download/v0.1.0/eve-sdk-win32-v0.1.0.zip">下载 eve-sdk-win32-v0.1.0.zip</a></div>
-      <div class="card"><span class="plat-name">Linux</span><span class="plat-desc">x86_64 · eve + 依赖</span><a class="dl" href="https://github.com/EVEngine/EVEngine/releases/download/v0.1.0/eve-sdk-linux-v0.1.0.zip">下载 eve-sdk-linux-v0.1.0.zip</a></div>
-      <div class="card"><span class="plat-name">macOS</span><span class="plat-desc">Apple Silicon · eve + Vulkan loader</span><a class="dl" href="https://github.com/EVEngine/EVEngine/releases/download/v0.1.0/eve-sdk-macosx-v0.1.0.zip">下载 eve-sdk-macosx-v0.1.0.zip</a></div>
-      <div class="card"><span class="plat-name">Android</span><span class="plat-desc">arm64 · libmain.so + 打包模板</span><a class="dl" href="https://github.com/EVEngine/EVEngine/releases/download/v0.1.0/eve-sdk-android-v0.1.0.zip">下载 eve-sdk-android-v0.1.0.zip</a></div>
-      <div class="card"><span class="plat-name">iOS</span><span class="plat-desc">arm64 · eve.app + 打包模板</span><a class="dl" href="https://github.com/EVEngine/EVEngine/releases/download/v0.1.0/eve-sdk-ios-v0.1.0.zip">下载 eve-sdk-ios-v0.1.0.zip</a></div>
+      <div class="card"><span class="plat-name">Windows</span><span class="plat-desc">x64 · eve.exe + 运行时 DLL</span><a class="dl" data-release-asset="win32" href="https://github.com/EVEngine/EVEngine/releases/download/v0.5.0/eve-sdk-win32-v0.5.0.zip">下载 eve-sdk-win32-v0.5.0.zip</a></div>
+      <div class="card"><span class="plat-name">Linux</span><span class="plat-desc">x86_64 · eve + 依赖</span><a class="dl" data-release-asset="linux" href="https://github.com/EVEngine/EVEngine/releases/download/v0.5.0/eve-sdk-linux-v0.5.0.zip">下载 eve-sdk-linux-v0.5.0.zip</a></div>
+      <div class="card"><span class="plat-name">macOS</span><span class="plat-desc">Apple Silicon · eve + Vulkan loader</span><a class="dl" data-release-asset="macosx" href="https://github.com/EVEngine/EVEngine/releases/download/v0.5.0/eve-sdk-macosx-v0.5.0.zip">下载 eve-sdk-macosx-v0.5.0.zip</a></div>
+      <div class="card"><span class="plat-name">Android</span><span class="plat-desc">arm64 · libmain.so + 打包模板</span><a class="dl" data-release-asset="android" href="https://github.com/EVEngine/EVEngine/releases/download/v0.5.0/eve-sdk-android-v0.5.0.zip">下载 eve-sdk-android-v0.5.0.zip</a></div>
+      <div class="card"><span class="plat-name">iOS</span><span class="plat-desc">arm64 · eve.app + 打包模板</span><a class="dl" data-release-asset="ios" href="https://github.com/EVEngine/EVEngine/releases/download/v0.5.0/eve-sdk-ios-v0.5.0.zip">下载 eve-sdk-ios-v0.5.0.zip</a></div>
       <div class="card"><span class="plat-name">WebGPU</span><span class="plat-desc">浏览器构建（源码构建）</span><a class="dl" href="https://github.com/EVEngine/EVEngine" target="_blank" rel="noopener">前往仓库构建 ↗</a></div>
     </div>
     <div class="aux-links">
-      <a href="https://github.com/EVEngine/EVEngine/releases/download/v0.1.0/SHA256SUMS">SHA256SUMS</a>
-      <a href="https://github.com/EVEngine/EVEngine/releases/tag/v0.1.0" target="_blank" rel="noopener">Release v0.1.0 ↗</a>
+      <a data-release-checksums href="https://github.com/EVEngine/EVEngine/releases/download/v0.5.0/SHA256SUMS">SHA256SUMS</a>
+      <a data-release-page href="https://github.com/EVEngine/EVEngine/releases/tag/v0.5.0" target="_blank" rel="noopener">Release v0.5.0 ↗</a>
       <a href="https://github.com/EVEngine/EVEngine" target="_blank" rel="noopener">源码仓库 ↗</a>
     </div>
+    <p class="release-status" id="releaseStatus" role="status" aria-live="polite">正在检查 GitHub 上的最新正式版本；当前提供 v0.5.0 作为回退。</p>
   </section>
   <section class="wrap" id="ai">
     <div class="sec-head">
@@ -349,6 +352,71 @@ claude mcp add evengine -- eve mcp</pre>
     </div>
   </footer>
   <script>
+    (function () {
+      var api = "https://api.github.com/repos/EVEngine/EVEngine/releases/latest";
+      var status = document.getElementById("releaseStatus");
+      var expectedPlatforms = ["win32", "linux", "macosx", "android", "ios"];
+
+      function isTrustedDownload(url) {
+        try {
+          var parsed = new URL(url);
+          return parsed.protocol === "https:" && parsed.hostname === "github.com";
+        } catch (e) {
+          return false;
+        }
+      }
+
+      fetch(api).then(function (response) {
+        if (!response.ok) throw new Error("GitHub API returned " + response.status);
+        return response.json();
+      }).then(function (release) {
+        var tag = typeof release.tag_name === "string" ? release.tag_name : "";
+        var assets = Array.isArray(release.assets) ? release.assets : [];
+        if (!/^v\d+\.\d+\.\d+$/.test(tag) || release.draft || release.prerelease) {
+          throw new Error("Latest release metadata is invalid");
+        }
+
+        var byName = {};
+        assets.forEach(function (asset) {
+          if (asset && typeof asset.name === "string" && isTrustedDownload(asset.browser_download_url)) {
+            byName[asset.name] = asset.browser_download_url;
+          }
+        });
+
+        var resolved = {};
+        expectedPlatforms.forEach(function (platform) {
+          var name = "eve-sdk-" + platform + "-" + tag + ".zip";
+          if (!byName[name]) throw new Error("Missing release asset " + name);
+          resolved[platform] = { name: name, url: byName[name] };
+        });
+        if (!byName.SHA256SUMS) throw new Error("Missing release asset SHA256SUMS");
+
+        document.querySelectorAll("[data-release-version]").forEach(function (el) {
+          el.textContent = tag;
+        });
+        document.querySelectorAll("[data-release-asset]").forEach(function (link) {
+          var asset = resolved[link.getAttribute("data-release-asset")];
+          if (!asset) return;
+          link.href = asset.url;
+          link.textContent = "下载 " + asset.name;
+        });
+
+        var checksums = document.querySelector("[data-release-checksums]");
+        if (checksums) checksums.href = byName.SHA256SUMS;
+        var page = document.querySelector("[data-release-page]");
+        if (page && isTrustedDownload(release.html_url)) {
+          page.href = release.html_url;
+          page.textContent = "Release " + tag + " ↗";
+        }
+        if (status) {
+          status.textContent = "已自动同步 GitHub Latest Release：" + tag;
+          status.classList.add("ok");
+        }
+      }).catch(function () {
+        if (status) status.textContent = "暂时无法读取 GitHub Latest Release，继续提供 v0.5.0 正式版下载。";
+      });
+    })();
+
     (function () {
       var n = 0;
       var el = document.getElementById("frameCounter");

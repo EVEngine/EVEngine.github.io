@@ -22,8 +22,10 @@ EVEngine 是一个 C++20 / Vulkan 游戏引擎，游戏逻辑用 Squirrel 脚本
 2. 环境变量 `EVE_SDK_DIR` 指向 SDK 根目录 → `$EVE_SDK_DIR/bin/eve`；
 3. 都没有则下载当前宿主平台的 SDK：
    - 平台目录名：`win32` / `linux` / `macosx` / `android` / `ios`
-   - 下载地址（替换 `<platform>`，例如 `win32`）：
-     `https://github.com/EVEngine/EVEngine/releases/latest/download/eve-sdk-<platform>-v0.1.0.zip`
+   - 查询 `https://api.github.com/repos/EVEngine/EVEngine/releases/latest`，从
+     `assets` 中选择名称严格匹配
+     `eve-sdk-<platform>-<tag_name>.zip` 的 `browser_download_url`；不要把版本号写死，
+     也不要猜测最新版文件名。
    - macOS / Linux：`curl -LO <url> && unzip <zip> -d <sdk-dir>`
    - Windows（PowerShell）：`Invoke-WebRequest <url> -OutFile sdk.zip; Expand-Archive sdk.zip -DestinationPath <sdk-dir>`
    - zip 内部带 `eve-sdk/<platform>/` 前缀，运行时位于
@@ -34,7 +36,7 @@ EVEngine 是一个 C++20 / Vulkan 游戏引擎，游戏逻辑用 Squirrel 脚本
 
 ## 2. 创建游戏（一个目录 + 两个脚本）
 
-优先用 `eve create <name>` 生成工程骨架（新版 SDK；v0.1.0 的 create
+优先用 `eve create <name>` 生成工程骨架（新版 SDK；早期 v0.1.0 的 create
 只建空目录，需手写下面两个文件）。
 一个游戏就是一个目录，至少包含 `config.nut` 和 `main.nut`：
 
@@ -79,7 +81,8 @@ local world = physics.newWorld(0.0, 980.0, true);  // Box2D 世界（+Y 向下�
 查某个类/函数的用法时先打开在线手册：
 https://evengine.github.io/EVEngine/（API 参考 + 用户手册 + 模块速查）。
 
-注意：v0.1.0 的 `eve doc` 命令有缺陷（打开失效站点且无终端输出），不要依赖它。
+注意：早期 v0.1.0 的 `eve doc` 命令有缺陷（打开失效站点且无终端输出）；当前版本
+仍应优先使用在线手册链接，以便获得最新文档。
 
 ## 3. 运行与热重载
 
