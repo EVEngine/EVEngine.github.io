@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EVEngine — Let AI handle the engine. Focus on your game.</title>
+  <meta name="description" content="EVEngine is a lightweight, script-driven, cross-platform game engine powered by Squirrel and Vulkan. Build for Windows, Linux, macOS, Android, iOS, and the web. Download the SDK and connect Codex, Cursor, or Claude Code with an Agent Skill and MCP.">
+  <meta property="og:title" content="EVEngine — Let AI handle the engine. Focus on your game.">
+  <meta property="og:description" content="Lightweight game engine · Squirrel scripting · Vulkan rendering · Cross-platform · AI integration">
+  <link rel="alternate" hreflang="zh-CN" href="https://evengine.github.io/">
+  <link rel="alternate" hreflang="en" href="https://evengine.github.io/en/">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2 28 9v14L16 30 4 23V9z' fill='%230B1020' stroke='%23FFC857' stroke-width='2'/%3E%3Cpath d='M16 9 22 12.5v7L16 23l-6-3.5v-7z' fill='%2359D8FF'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0B1020;
+      --panel: #111A2E;
+      --panel-2: #0E1626;
+      --line: #22314F;
+      --signal: #FFC857;
+      --accent: #59D8FF;
+      --paper: #E7ECF6;
+      --muted: #8FA0BE;
+      --ok: #6FDD8B;
+      --display: "Chakra Petch", system-ui, sans-serif;
+      --body: "Inter", system-ui, sans-serif;
+      --mono: "IBM Plex Mono", ui-monospace, monospace;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--paper);
+      font: 400 16px/1.65 var(--body);
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    :focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; border-radius: 2px; }
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+    .backdrop {
+      position: fixed; inset: 0; z-index: -1; pointer-events: none;
+      background:
+        linear-gradient(var(--line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line) 1px, transparent 1px);
+      background-size: 44px 44px;
+      -webkit-mask-image: radial-gradient(ellipse at 50% 0%, rgba(0,0,0,.55), transparent 75%);
+      mask-image: radial-gradient(ellipse at 50% 0%, rgba(0,0,0,.55), transparent 75%);
+    }
+    nav { position: sticky; top: 0; z-index: 10; backdrop-filter: blur(8px); background: rgba(11,16,32,.78); border-bottom: 1px solid var(--line); }
+    .nav { display: flex; align-items: center; gap: 22px; min-height: 58px; padding-top: 10px; padding-bottom: 10px; }
+    .brand { display: flex; align-items: center; gap: 10px; font: 600 16px var(--display); color: var(--paper); }
+    .brand svg { width: 22px; height: 22px; }
+    .nav-links { margin-left: auto; flex-wrap: wrap; justify-content: flex-end; display: flex; gap: 18px; font-size: 14px; }
+    .nav-links a { color: var(--muted); }
+    .nav-links a:hover { color: var(--paper); text-decoration: none; }
+    .hero { padding: 96px 0 64px; }
+    .eyebrow {
+      font: 500 13px var(--mono); letter-spacing: .18em; color: var(--signal);
+      text-transform: uppercase; display: flex; align-items: center; gap: 10px;
+    }
+    .eyebrow::before { content: ""; width: 26px; height: 1px; background: var(--signal); }
+    h1 {
+      font: 700 clamp(34px, 6vw, 64px)/1.08 var(--display);
+      margin: 20px 0 14px; letter-spacing: .01em;
+    }
+    h1 .zh { display: block; }
+    h1 .en {
+      display: block; margin-top: 14px;
+      font: 500 clamp(15px, 2.2vw, 20px)/1.5 var(--body);
+      color: var(--muted); letter-spacing: .01em;
+    }
+    .hero-actions { display: flex; gap: 14px; margin-top: 30px; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 11px 20px; border-radius: 6px;
+      font: 600 15px var(--body); border: 1px solid var(--line);
+      background: var(--panel); color: var(--paper);
+      transition: border-color .15s, transform .15s;
+    }
+    .btn:hover { text-decoration: none; border-color: var(--signal); transform: translateY(-1px); }
+    .btn.signal { background: var(--signal); color: #1A1406; border-color: var(--signal); }
+    .btn.signal:hover { background: #FFD87A; }
+    .console {
+      margin-top: 44px; border: 1px solid var(--line); border-radius: 8px;
+      background: var(--panel-2); overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,.35);
+    }
+    .console-bar {
+      display: flex; align-items: center; gap: 8px; padding: 9px 14px;
+      border-bottom: 1px solid var(--line); background: var(--panel);
+      font: 500 12px var(--mono); color: var(--muted);
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot.r { background: #FF6B6B; } .dot.y { background: var(--signal); } .dot.g { background: var(--ok); }
+    .console-title { margin-left: 6px; letter-spacing: .06em; }
+    .console-body { padding: 18px 20px 20px; font: 400 13.5px/1.8 var(--mono); }
+    .c-line { display: block; white-space: pre-wrap; opacity: 0; animation: rise .4s ease forwards; }
+    .c-line:nth-child(1) { animation-delay: .15s; }
+    .c-line:nth-child(2) { animation-delay: .45s; }
+    .c-line:nth-child(3) { animation-delay: .75s; }
+    .c-line:nth-child(4) { animation-delay: 1.05s; }
+    .c-line:nth-child(5) { animation-delay: 1.35s; }
+    .c-prompt { color: var(--accent); }
+    .c-ok { color: var(--ok); }
+    .c-dim { color: var(--muted); }
+    .c-frame { color: var(--signal); }
+    .cursor { display: inline-block; width: 8px; height: 15px; background: var(--signal); vertical-align: -2px; margin-left: 2px; animation: blink 1.1s steps(1) infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+    @keyframes rise { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .cursor { animation: none; }
+      .c-line { animation: none !important; opacity: 1 !important; }
+    }
+    section { padding: 58px 0; border-top: 1px solid var(--line); }
+    .sec-head { margin-bottom: 28px; }
+    .sec-eyebrow { font: 500 12px var(--mono); letter-spacing: .18em; color: var(--signal); text-transform: uppercase; }
+    h2 { font: 600 clamp(22px, 3.4vw, 32px) var(--display); margin: 8px 0 6px; }
+    .sec-sub { color: var(--muted); max-width: 640px; margin: 0; }
+    .platforms { display: flex; flex-wrap: wrap; gap: 10px; }
+    .plat {
+      padding: 10px 16px; border: 1px solid var(--line); border-radius: 6px;
+      background: var(--panel); font: 600 14px var(--display); color: var(--paper);
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .plat::before { content: ""; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); transform: rotate(45deg); }
+    .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+    .card {
+      border: 1px solid var(--line); border-radius: 8px; background: var(--panel);
+      padding: 18px; display: flex; flex-direction: column; gap: 8px;
+      transition: border-color .15s, transform .15s;
+    }
+    .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .card .plat-name { font: 600 17px var(--display); color: var(--paper); }
+    .card .plat-desc { font: 400 13px var(--body); color: var(--muted); }
+    .card a.dl { margin-top: auto; font: 600 13px var(--mono); color: var(--accent); }
+    .aux-links { margin-top: 18px; display: flex; gap: 18px; flex-wrap: wrap; font: 500 14px var(--mono); }
+    .release-status { margin-top: 12px; color: var(--muted); font: 400 12px/1.6 var(--mono); }
+    .release-status.ok { color: var(--ok); }
+    .ai-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+    .ai-card { border: 1px solid var(--line); border-radius: 8px; background: var(--panel); padding: 24px; }
+    .ai-card h3 { font: 600 19px var(--display); margin: 0 0 10px; display: flex; align-items: center; gap: 10px; }
+    .tag { font: 500 11px var(--mono); letter-spacing: .08em; color: var(--signal); border: 1px solid var(--line); padding: 2px 8px; border-radius: 999px; }
+    .ai-card p { margin: 0 0 14px; color: var(--muted); font-size: 14.5px; }
+    .ai-quick { border: 1px solid var(--line); border-radius: 8px; background: var(--panel); padding: 18px; margin-bottom: 18px; }
+    .ai-quick .tag { margin-bottom: 12px; display: inline-block; }
+    .ai-quick p { color: var(--muted); font-size: 14px; margin: 4px 0 0; }
+    .copy-wrap { position: relative; }
+    .copy-btn {
+      position: absolute; top: 8px; right: 8px;
+      font: 500 11px var(--mono); letter-spacing: .05em;
+      color: var(--muted); background: var(--panel); border: 1px solid var(--line);
+      border-radius: 4px; padding: 3px 9px; cursor: pointer; opacity: .9;
+    }
+    .copy-btn:hover { color: var(--paper); border-color: var(--accent); }
+    .copy-btn.done { color: var(--ok); border-color: var(--ok); }
+    .mcp-note { color: var(--muted); font-size: 14px; margin: 18px 0 0; }
+    pre {
+      margin: 0 0 14px; padding: 14px 16px; border-radius: 6px;
+      background: var(--panel-2); border: 1px solid var(--line);
+      font: 400 13px/1.7 var(--mono); overflow-x: auto; color: var(--paper);
+    }
+    .copy-wrap pre { padding-right: 64px; }
+    pre .cm { color: var(--muted); }
+    .links { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+    .link-card { border: 1px solid var(--line); border-radius: 8px; background: var(--panel); padding: 20px; }
+    .link-card h3 { font: 600 17px var(--display); margin: 0 0 6px; }
+    .link-card p { margin: 0 0 10px; color: var(--muted); font-size: 14px; }
+    .link-card a { font: 500 14px var(--mono); }
+    footer { padding: 34px 0 48px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+    .foot { display: flex; gap: 18px; flex-wrap: wrap; align-items: baseline; }
+    @media (max-width: 640px) {
+      .hero { padding-top: 64px; }
+      .nav-links { gap: 12px; font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="backdrop" aria-hidden="true"></div>
+  <nav>
+    <div class="wrap nav">
+      <a class="brand" href="#top" aria-label="EVEngine home">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2 28 9v14L16 30 4 23V9z" fill="none" stroke="#FFC857" stroke-width="2"/><path d="M16 9 22 12.5v7L16 23l-6-3.5v-7z" fill="#59D8FF"/></svg>
+        EVEngine
+      </a>
+      <div class="nav-links">
+        <a href="/" lang="zh-CN" hreflang="zh-CN" aria-label="Switch to Chinese">中文</a>
+        <a href="#download">Download SDK</a>
+        <a href="#ai">AI setup</a>
+        <a href="https://evengine.github.io/EVEngine/" target="_blank" rel="noopener">Docs</a>
+        <a href="https://evengine.github.io/Blog/" target="_blank" rel="noopener">Blog</a>
+        <a href="https://github.com/EVEngine/EVEngine" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </nav>
+  <header class="hero wrap" id="top">
+    <div class="eyebrow">EVEngine · <span data-release-version>v0.5.0</span> · Vulkan · Squirrel</div>
+    <h1>
+      <span class="zh">Let AI handle the engine.<br>Focus on your game.</span>
+      <span class="en">A lightweight game engine with Squirrel scripting and Vulkan rendering. Download the SDK, connect your AI coding assistant, and start building.</span>
+    </h1>
+    <div class="hero-actions">
+      <a class="btn signal" href="#download">Download SDK</a>
+      <a class="btn" href="#ai">Connect your AI</a>
+      <a class="btn" href="https://github.com/EVEngine/EVEngine" target="_blank" rel="noopener">GitHub ↗</a>
+    </div>
+    <div class="console" aria-label="Terminal output from an EVEngine example">
+      <div class="console-bar">
+        <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+        <span class="console-title">eve — examples/basic</span>
+      </div>
+      <div class="console-body">
+        <span class="c-line"><span class="c-prompt">$</span> eve run examples/basic</span>
+        <span class="c-line"><span class="c-ok">[system]</span> <span class="c-dim">platform=win32&nbsp; renderer=vulkan&nbsp; script=squirrel&nbsp; hotreload=on</span></span>
+        <span class="c-line"><span class="c-ok">[startup]</span> <span class="c-dim">graphics initWithWindow: 857.5 ms &nbsp;·&nbsp; modules: 56/56</span></span>
+        <span class="c-line"><span class="c-ok">[scene]</span> <span class="c-dim">tilemap + box2d + particles ready</span></span>
+        <span class="c-line"><span class="c-frame">[frame]</span> <span class="c-dim">fps=60&nbsp; draw_calls=42&nbsp; frame=</span><span class="c-frame" id="frameCounter">000000</span><span class="cursor" aria-hidden="true"></span></span>
+      </div>
+    </div>
+  </header>
+  <section class="wrap">
+    <div class="sec-head">
+      <div class="sec-eyebrow">Platforms</div>
+      <h2>One engine. Six platforms.</h2>
+      <p class="sec-sub">A Vulkan rendering core and a Squirrel scripting layer. Use the same game code across desktop, mobile, and the browser.</p>
+    </div>
+    <div class="platforms">
+      <span class="plat">Windows</span>
+      <span class="plat">Linux</span>
+      <span class="plat">macOS</span>
+      <span class="plat">Android</span>
+      <span class="plat">iOS</span>
+      <span class="plat">WebGPU / WASM</span>
+    </div>
+  </section>
+  <section class="wrap" id="download">
+    <div class="sec-head">
+      <div class="sec-eyebrow">Download</div>
+      <h2>Download SDK</h2>
+      <p class="sec-sub">Download and extract the SDK for your platform—no engine build required. Each SDK includes the eve runtime, public headers, CMake plugin support (find_package + add_eve_plugin), and packaging templates. Stable release: <span data-release-version>v0.5.0</span>.</p>
+    </div>
+    <div class="grid">
+      <div class="card"><span class="plat-name">Windows</span><span class="plat-desc">x64 · eve.exe + runtime DLLs</span><a class="dl" data-release-asset="win32" href="https://github.com/EVEngine/EVEngine/releases/download/v0.5.0/eve-sdk-win32-v0.5.0.zip">Download eve-sdk-win32-v0.5.0.zip</a></div>
+      <div class="card"><span class="plat-name">Linux</span><span class="plat-desc">x86_64 · eve + dependencies</span><a class="dl" data-release-asset="linux" href="https://github.com/EVEngine/EVEngine/releases/download/v0.5.0/eve-sdk-linux-v0.5.0.zip">Download eve-sdk-linux-v0.5.0.zip</a></div>
+      <div class="card"><span class="plat-name">macOS</span><span class="plat-desc">Apple Silicon · eve + Vulkan loader</span><a class="dl" data-release-asset="macosx" href="https://github.com/EVEngine/EVEngine/releases/download/v0.5.0/eve-sdk-macosx-v0.5.0.zip">Download eve-sdk-macosx-v0.5.0.zip</a></div>
+      <div class="card"><span class="plat-name">Android</span><span class="plat-desc">arm64 · libmain.so + packaging templates</span><a class="dl" data-release-asset="android" href="https://github.com/EVEngine/EVEngine/releases/download/v0.5.0/eve-sdk-android-v0.5.0.zip">Download eve-sdk-android-v0.5.0.zip</a></div>
+      <div class="card"><span class="plat-name">iOS</span><span class="plat-desc">arm64 · eve.app + packaging templates</span><a class="dl" data-release-asset="ios" href="https://github.com/EVEngine/EVEngine/releases/download/v0.5.0/eve-sdk-ios-v0.5.0.zip">Download eve-sdk-ios-v0.5.0.zip</a></div>
+      <div class="card"><span class="plat-name">WebGPU</span><span class="plat-desc">Browser target · build from source</span><a class="dl" href="https://github.com/EVEngine/EVEngine" target="_blank" rel="noopener">Build from source ↗</a></div>
+    </div>
+    <div class="aux-links">
+      <a data-release-checksums href="https://github.com/EVEngine/EVEngine/releases/download/v0.5.0/SHA256SUMS">SHA256SUMS</a>
+      <a data-release-page href="https://github.com/EVEngine/EVEngine/releases/tag/v0.5.0" target="_blank" rel="noopener">Release v0.5.0 ↗</a>
+      <a href="https://github.com/EVEngine/EVEngine" target="_blank" rel="noopener">Source repository ↗</a>
+    </div>
+    <p class="release-status" id="releaseStatus" role="status" aria-live="polite">Checking GitHub for the latest stable release. Showing v0.5.0 until the check completes.</p>
+  </section>
+  <section class="wrap" id="ai">
+    <div class="sec-head">
+      <div class="sec-eyebrow">AI-native</div>
+      <h2>Connect your AI coding assistant</h2>
+      <p class="sec-sub">Connect through Cursor’s Add to Cursor link, or run the installer for Codex or Claude Code. The Agent Skill provides EVEngine guidance, while MCP lets your assistant work with the engine to write scripts, run and debug your game, and package builds.</p>
+    </div>
+    <div class="ai-quick">
+      <span class="tag">Quick setup</span>
+      <div class="copy-wrap">
+        <pre><span class="cm"># macOS / Linux / Git Bash (tool: codex | cursor | claude)</span>
+curl -fsSL https://raw.githubusercontent.com/EVEngine/EVEngine.github.io/main/scripts/install-skill.sh | bash -s codex
+
+<span class="cm"># Windows PowerShell (defaults to Codex)</span>
+irm https://raw.githubusercontent.com/EVEngine/EVEngine.github.io/main/scripts/install-skill.ps1 | iex</pre>
+        <button class="copy-btn" type="button">Copy</button>
+      </div>
+      <p>The installer adds the skill to your assistant’s global skills directory. If <code>eve</code> is on your PATH, it also registers the MCP server.
+        To choose another assistant in Windows PowerShell: <code>iex ((irm https://raw.githubusercontent.com/EVEngine/EVEngine.github.io/main/scripts/install-skill.ps1) + ' -Tool cursor')</code>。</p>
+    </div>
+    <div class="ai-grid">
+      <div class="ai-card">
+        <h3>Codex <span class="tag">skill + MCP</span></h3>
+        <p>The skill teaches Codex how to use <code>eve</code>: locate the SDK, create projects, edit scripts, run games, and package builds.</p>
+        <div class="copy-wrap">
+          <pre><span class="cm"># 1) Install the skill for your user account (all projects)</span>
+mkdir -p ~/.agents/skills/evengine && \
+curl -fsSL https://raw.githubusercontent.com/EVEngine/EVEngine.github.io/main/skills/evengine/SKILL.md \
+  -o ~/.agents/skills/evengine/SKILL.md
+
+<span class="cm"># 2) Connect Codex to the engine through MCP (root defaults to the current project)</span>
+codex mcp add evengine -- eve mcp</pre>
+          <button class="copy-btn" type="button">Copy</button>
+        </div>
+        <p>Alternatively, add <code>[mcp_servers.evengine]</code> with <code>command = "eve"</code> and <code>args = ["mcp"]</code> to <code>~/.codex/config.toml</code>. Add <code>--root &lt;dir&gt;</code> to the arguments to specify your game directory.</p>
+      </div>
+      <div class="ai-card">
+        <h3>Cursor <span class="tag">skill + MCP</span></h3>
+        <p>Cursor loads skills from <code>.agents/skills</code>, <code>.cursor/skills</code>, and their global equivalents. Install globally to use the skill across projects.</p>
+        <a class="btn signal" style="margin-bottom:14px" href="https://cursor.com/install-mcp?name=evengine&config=eyJjb21tYW5kIjoiZXZlIiwiYXJncyI6WyJtY3AiXX0%3D" target="_blank" rel="noopener">Add to Cursor ↗</a>
+        <div class="copy-wrap">
+          <pre><span class="cm"># Install the skill globally; MCP requires eve on your PATH</span>
+mkdir -p ~/.cursor/skills/evengine && \
+curl -fsSL https://raw.githubusercontent.com/EVEngine/EVEngine.github.io/main/skills/evengine/SKILL.md \
+  -o ~/.cursor/skills/evengine/SKILL.md
+
+<span class="cm"># Or create .cursor/mcp.json in your project root</span>
+<span class="c-dim">{ "mcpServers": { "evengine": {</span>
+    <span class="c-dim">"command": "eve",</span>
+    <span class="c-dim">"args": ["mcp"]</span>
+<span class="c-dim">} } }</span></pre>
+          <button class="copy-btn" type="button">Copy</button>
+        </div>
+        <p>To share the skill with your team, add it to <code>.cursor/skills/evengine/</code> in your game repository. The MCP server uses the open project directory as the game root by default.</p>
+      </div>
+      <div class="ai-card">
+        <h3>Claude Code <span class="tag">skill + MCP</span></h3>
+        <p>Claude Code supports the Agent Skills open standard, so the same SKILL.md works here too. Install it for your user account or a specific project.</p>
+        <div class="copy-wrap">
+          <pre><span class="cm"># 1) Install the skill for your user account</span>
+mkdir -p ~/.claude/skills/evengine && \
+curl -fsSL https://raw.githubusercontent.com/EVEngine/EVEngine.github.io/main/skills/evengine/SKILL.md \
+  -o ~/.claude/skills/evengine/SKILL.md
+
+<span class="cm"># 2) Register the MCP server</span>
+claude mcp add evengine -- eve mcp</pre>
+          <button class="copy-btn" type="button">Copy</button>
+        </div>
+        <p>To share the setup through your repository, add the skill under <code>.claude/skills/</code> and configure MCP in the project’s <code>.mcp.json</code>.</p>
+      </div>
+    </div>
+    <p class="mcp-note"><code>eve mcp</code> is an MCP server for AI coding tools; it does not include a language model. Your assistant starts it automatically using the MCP configuration above. No manual startup is needed.</p>
+    <div class="aux-links">
+      <a href="https://github.com/EVEngine/EVEngine.github.io/tree/main/skills/evengine" target="_blank" rel="noopener">Get the EVEngine skill ↗</a>
+      <a href="https://github.com/EVEngine/EVEngine/tree/main/tools/eve-mcp" target="_blank" rel="noopener">eve-mcp source ↗</a>
+    </div>
+  </section>
+  <section class="wrap">
+    <div class="sec-head">
+      <div class="sec-eyebrow">Learn</div>
+      <h2>Docs &amp; resources</h2>
+    </div>
+    <div class="links">
+      <div class="link-card"><h3>Documentation</h3><p>API reference, user guide, and module reference, continuously built on GitHub Pages.</p><a href="https://evengine.github.io/EVEngine/" target="_blank" rel="noopener">evengine.github.io/EVEngine/ ↗</a></div>
+      <div class="link-card"><h3>Developer blog</h3><p>Development updates and release stories: the design decisions and tradeoffs behind each milestone, published from Markdown.</p><a href="https://evengine.github.io/Blog/" target="_blank" rel="noopener">evengine.github.io/Blog/ ↗</a></div>
+      <div class="link-card"><h3>Source repository</h3><p>Explore the code, examples, and tests. Report issues and find releases.</p><a href="https://github.com/EVEngine/EVEngine" target="_blank" rel="noopener">github.com/EVEngine/EVEngine ↗</a></div>
+      <div class="link-card"><h3>Quick start</h3><p>Download the SDK, install the skill, and run your first example.</p><a href="#download">Get the SDK ↗</a></div>
+    </div>
+  </section>
+  <footer>
+    <div class="wrap foot">
+      <span>EVEngine © 2026 · Open-source and commercial licensing. See LICENSE-OPENSOURCE / LICENSE-COMMERCIAL in the repository.</span>
+      <a href="https://github.com/EVEngine/EVEngine" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://evengine.github.io/Blog/" target="_blank" rel="noopener">Blog</a>
+      <a href="https://evengine.github.io/EVEngine/" target="_blank" rel="noopener">Docs</a>
+    </div>
+  </footer>
+  <script>
+    (function () {
+      var api = "https://api.github.com/repos/EVEngine/EVEngine/releases/latest";
+      var status = document.getElementById("releaseStatus");
+      var expectedPlatforms = ["win32", "linux", "macosx", "android", "ios"];
+
+      function isTrustedDownload(url) {
+        try {
+          var parsed = new URL(url);
+          return parsed.protocol === "https:" && parsed.hostname === "github.com";
+        } catch (e) {
+          return false;
+        }
+      }
+
+      fetch(api).then(function (response) {
+        if (!response.ok) throw new Error("GitHub API returned " + response.status);
+        return response.json();
+      }).then(function (release) {
+        var tag = typeof release.tag_name === "string" ? release.tag_name : "";
+        var assets = Array.isArray(release.assets) ? release.assets : [];
+        if (!/^v\d+\.\d+\.\d+$/.test(tag) || release.draft || release.prerelease) {
+          throw new Error("Latest release metadata is invalid");
+        }
+
+        var byName = {};
+        assets.forEach(function (asset) {
+          if (asset && typeof asset.name === "string" && isTrustedDownload(asset.browser_download_url)) {
+            byName[asset.name] = asset.browser_download_url;
+          }
+        });
+
+        var resolved = {};
+        expectedPlatforms.forEach(function (platform) {
+          var name = "eve-sdk-" + platform + "-" + tag + ".zip";
+          if (!byName[name]) throw new Error("Missing release asset " + name);
+          resolved[platform] = { name: name, url: byName[name] };
+        });
+        if (!byName.SHA256SUMS) throw new Error("Missing release asset SHA256SUMS");
+
+        document.querySelectorAll("[data-release-version]").forEach(function (el) {
+          el.textContent = tag;
+        });
+        document.querySelectorAll("[data-release-asset]").forEach(function (link) {
+          var asset = resolved[link.getAttribute("data-release-asset")];
+          if (!asset) return;
+          link.href = asset.url;
+          link.textContent = "Download " + asset.name;
+        });
+
+        var checksums = document.querySelector("[data-release-checksums]");
+        if (checksums) checksums.href = byName.SHA256SUMS;
+        var page = document.querySelector("[data-release-page]");
+        if (page && isTrustedDownload(release.html_url)) {
+          page.href = release.html_url;
+          page.textContent = "Release " + tag + " ↗";
+        }
+        if (status) {
+          status.textContent = "Updated to the latest GitHub release: " + tag;
+          status.classList.add("ok");
+        }
+      }).catch(function () {
+        if (status) status.textContent = "Could not check the latest GitHub release. Downloads for stable release v0.5.0 are still available.";
+      });
+    })();
+
+    (function () {
+      var n = 0;
+      var el = document.getElementById("frameCounter");
+      var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (reduce || !el) return;
+      setInterval(function () {
+        n += 60;
+        el.textContent = String(n).padStart(6, "0");
+      }, 1000);
+    })();
+
+    (function () {
+      function fallbackCopy(text) {
+        var ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand("copy"); } catch (e) { /* noop */ }
+        document.body.removeChild(ta);
+      }
+      document.querySelectorAll(".copy-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var pre = btn.parentElement.querySelector("pre");
+          var text = pre ? pre.innerText : "";
+          function done() {
+            btn.textContent = "Copied ✓";
+            btn.classList.add("done");
+            setTimeout(function () {
+              btn.textContent = "Copy";
+              btn.classList.remove("done");
+            }, 1600);
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(done, function () {
+              fallbackCopy(text);
+              done();
+            });
+          } else {
+            fallbackCopy(text);
+            done();
+          }
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

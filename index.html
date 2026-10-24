@@ -7,6 +7,8 @@
   <meta name="description" content="EVEngine：一个轻量、可脚本化、跨平台的游戏引擎。Squirrel 脚本驱动、Vulkan 渲染，支持 Windows / Linux / macOS / Android / iOS / WebGPU。下载 SDK 即用，AI 编程助手（Codex / Cursor / Claude Code）可一键接入：skill + MCP。">
   <meta property="og:title" content="EVEngine — 把引擎交给 AI，把游戏留给自己">
   <meta property="og:description" content="轻量 Squirrel 脚本游戏引擎 · Vulkan 渲染 · 跨平台 · AI 一键接入">
+  <link rel="alternate" hreflang="zh-CN" href="https://evengine.github.io/">
+  <link rel="alternate" hreflang="en" href="https://evengine.github.io/en/">
   <meta property="og:type" content="website">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2 28 9v14L16 30 4 23V9z' fill='%230B1020' stroke='%23FFC857' stroke-width='2'/%3E%3Cpath d='M16 9 22 12.5v7L16 23l-6-3.5v-7z' fill='%2359D8FF'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -50,10 +52,10 @@
       mask-image: radial-gradient(ellipse at 50% 0%, rgba(0,0,0,.55), transparent 75%);
     }
     nav { position: sticky; top: 0; z-index: 10; backdrop-filter: blur(8px); background: rgba(11,16,32,.78); border-bottom: 1px solid var(--line); }
-    .nav { display: flex; align-items: center; gap: 22px; height: 58px; }
+    .nav { display: flex; align-items: center; gap: 22px; min-height: 58px; padding-top: 10px; padding-bottom: 10px; }
     .brand { display: flex; align-items: center; gap: 10px; font: 600 16px var(--display); color: var(--paper); }
     .brand svg { width: 22px; height: 22px; }
-    .nav-links { margin-left: auto; display: flex; gap: 18px; font-size: 14px; }
+    .nav-links { margin-left: auto; flex-wrap: wrap; justify-content: flex-end; display: flex; gap: 18px; font-size: 14px; }
     .nav-links a { color: var(--muted); }
     .nav-links a:hover { color: var(--paper); text-decoration: none; }
     .hero { padding: 96px 0 64px; }
@@ -186,6 +188,7 @@
         EVEngine
       </a>
       <div class="nav-links">
+        <a href="/en/" lang="en" hreflang="en" aria-label="Switch to English">English</a>
         <a href="#download">下载 SDK</a>
         <a href="#ai">AI 接入</a>
         <a href="https://evengine.github.io/EVEngine/" target="_blank" rel="noopener">文档</a>
